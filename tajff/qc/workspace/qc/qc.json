@@ -1,0 +1,75 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"WHiIjEoq9F\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Rejected Item\",\"col\":3}},{\"id\":\"6Zn8CMDbDS\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Pending Items\",\"col\":3}},{\"id\":\"66vQb4JTDL\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Raw Material Specification\",\"col\":7}},{\"id\":\"5UdVe9qmWT\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Visitor\",\"col\":7}},{\"id\":\"_K-kSGsDxx\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Laboratory Test\",\"col\":7}}]",
+ "creation": "2024-12-30 13:16:13.926119",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "quality",
+ "idx": 0,
+ "indicator_color": "",
+ "is_hidden": 0,
+ "label": "QC",
+ "links": [],
+ "modified": "2025-02-01 00:35:42.527125",
+ "modified_by": "Administrator",
+ "module": "QC",
+ "name": "QC",
+ "number_cards": [
+  {
+   "label": "Pending Items",
+   "number_card_name": "Pending Items"
+  },
+  {
+   "label": "Rejected Item",
+   "number_card_name": "Rejected Item"
+  }
+ ],
+ "owner": "m.bajandooh@tajff.com",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "QC User"
+  },
+  {
+   "role": "Quality Manager"
+  }
+ ],
+ "sequence_id": 1.1,
+ "shortcuts": [
+  {
+   "color": "Red",
+   "doc_view": "List",
+   "format": "Open",
+   "label": "Visitor",
+   "link_to": "Visitor",
+   "stats_filter": "[[\"Visitor\",\"status\",\"=\",\"Open\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Orange",
+   "doc_view": "List",
+   "format": "{} Open",
+   "label": "Raw Material Specification",
+   "link_to": "Raw Material Specification",
+   "stats_filter": "[[\"Raw Material Specification\",\"status\",\"=\",\"Open\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Laboratory Test",
+   "link_to": "Laboratory Test",
+   "stats_filter": "[]",
+   "type": "DocType"
+  }
+ ],
+ "title": "QC"
+}
