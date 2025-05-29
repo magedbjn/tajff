@@ -13,7 +13,7 @@
  "is_hidden": 0,
  "label": "QC",
  "links": [],
- "modified": "2025-02-01 00:35:42.527125",
+ "modified": "2025-05-27 17:00:24.261625",
  "modified_by": "Administrator",
  "module": "QC",
  "name": "QC",
@@ -42,7 +42,7 @@
    "role": "Quality Manager"
   }
  ],
- "sequence_id": 1.1,
+ "sequence_id": 4.0,
  "shortcuts": [
   {
    "color": "Red",
