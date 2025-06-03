@@ -141,6 +141,10 @@ doc_events = {
     "Item":{
         'before_save': "tajff.qc.doctype.raw_material_specification.override.item.raw_material_speceification"
     },
+    "Leave Application": {
+        "before_save": "tajff.custom.leave_Application.before_save",
+        "before_submit": "tajff.custom.leave_Application.validate_employee"
+	},
     # "Licenses":{
     #     'before_save': "tajff.documents.doctype.licenses.licenses.before_save",
     #     'on_update': "tajff.documents.doctype.licenses.licenses.on_update"
@@ -252,7 +256,14 @@ scheduler_events = {
 fixtures = [
     {"doctype": "Client Script",},
     {"doctype": "Server Script",},
-    {"doctype": "Custom Field",},
+    #{"doctype": "Custom Field",},
+    {"doctype": "Custom Field","filters": [
+        [
+            "dt", "in", [
+                "Leave Application"
+			]
+		]
+	]},
     # {"doctype": "Item", "filters": 
     #  [["custom_raw_material_specification", "in", [
     #     "Rejected","Approved"

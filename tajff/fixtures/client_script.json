@@ -2,6 +2,17 @@
  {
   "docstatus": 0,
   "doctype": "Client Script",
+  "dt": "Stock Reconciliation",
+  "enabled": 0,
+  "modified": "2025-01-05 10:16:13.836524",
+  "module": null,
+  "name": "Stock Reconciliation Update Price",
+  "script": "frappe.ui.form.on('Stock Reconciliation', {\n\t\n});\n\n\nfrappe.ui.form.on('Stock Reconciliation Item', {\n    item_code: function(frm, cdt, cdn) {\n        var item = frappe.get_doc(cdt, cdn);\n        var price_list = frm.doc.price_list; // Get the selected price list from the Opportunity DocType\n        var item_code = item.item_code;\n\n        frappe.call({\n            method: 'frappe.client.get_value',\n            args: {\n                doctype: 'Item Price',\n                filters: {\n                    item_code: item_code,\n                    price_list: price_list\n                },\n                fieldname: 'price_list_rate'\n            },\n            callback: function(response) {\n                if (response && response.message) {\n                    frappe.model.set_value(cdt, cdn, 'valuation_rate', response.message.price_list_rate);\n                }\n            }\n        });\n    }\n})",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
   "dt": "Journal Entry",
   "enabled": 1,
   "modified": "2025-01-01 09:59:47.568149",
