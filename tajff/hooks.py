@@ -139,7 +139,7 @@ app_license = "mit"
 
 doc_events = {
     "Item":{
-        'before_save': "tajff.qc.doctype.raw_material_specification.override.item.raw_material_speceification"
+        'validate': "tajff.qc.doctype.raw_material_specification.override.item.raw_material_speceification"
     },
     "Leave Application": {
         "before_save": "tajff.custom.leave_Application.before_save",

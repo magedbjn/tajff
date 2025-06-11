@@ -11,6 +11,7 @@ class Licenses(Document):
         self.update_license_status()
     
     def update_license_status(self):
+        # Core status calculation logic
         if not self.expiry_date:
             return
             
@@ -32,25 +33,18 @@ class Licenses(Document):
 
 
 def scheduled_status_update():
-    # Only update licenses that are not already expired
     update_status('Licenses', filters={'status': ['!=', 'Expired']})
 
-
 def update_status(doctype, filters=None):
-    # Initialize filters if None
+    # Efficient batch processing with single commit
     if filters is None:
         filters = {}
     
-    # Ensure we don't process already expired licenses unless explicitly requested
     if 'status' not in filters:
         filters['status'] = ['!=', 'Expired']
     
     today_date = getdate(today())
-    docs = frappe.get_all(
-        doctype, 
-        filters=filters, 
-        fields=['name', 'expiry_date', 'status', 'license_english']
-    )
+    docs = frappe.get_all(doctype, filters=filters, fields=['name', 'expiry_date', 'status', 'license_english'])
     
     updates = []
     
