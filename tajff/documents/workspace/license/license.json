@@ -1,0 +1,63 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"pLGeHkayGi\",\"type\":\"card\",\"data\":{\"card_name\":\"Licenses\",\"col\":4}}]",
+ "creation": "2025-06-11 19:06:53.647576",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "milestone",
+ "idx": 0,
+ "indicator_color": "green",
+ "is_hidden": 0,
+ "label": "License",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Licenses",
+   "link_count": 2,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Licenses",
+   "link_count": 0,
+   "link_to": "Licenses",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Licenses Type",
+   "link_count": 0,
+   "link_to": "Licenses Type",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2025-06-11 19:14:16.901464",
+ "modified_by": "Administrator",
+ "module": "Documents",
+ "name": "License",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "Home",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [
+  {
+   "role": "All"
+  }
+ ],
+ "sequence_id": 35.0,
+ "shortcuts": [],
+ "title": "License"
+}
