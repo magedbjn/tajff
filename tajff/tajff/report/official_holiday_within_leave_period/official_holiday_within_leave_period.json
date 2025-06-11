@@ -11,9 +11,9 @@
  "is_standard": "Yes",
  "letter_head": "",
  "letterhead": null,
- "modified": "2025-06-06 02:11:17.575888",
+ "modified": "2025-06-11 23:20:41.796007",
  "modified_by": "Administrator",
- "module": "docs",
+ "module": "Tajff",
  "name": "Official Holiday Within Leave Period",
  "owner": "Administrator",
  "prepared_report": 0,
@@ -22,43 +22,10 @@
  "report_type": "Script Report",
  "roles": [
   {
-   "role": "Leave Approver"
-  },
-  {
    "role": "HR Manager"
   },
   {
    "role": "HR User"
-  },
-  {
-   "role": "Employee"
-  },
-  {
-   "role": "QC User"
-  },
-  {
-   "role": "Manufacturing User"
-  },
-  {
-   "role": "Maintenance User"
-  },
-  {
-   "role": "Maintenance Manager"
-  },
-  {
-   "role": "RND User"
-  },
-  {
-   "role": "RND Manager"
-  },
-  {
-   "role": "Accounts Manager"
-  },
-  {
-   "role": "Support Account"
-  },
-  {
-   "role": "Employee Self Service"
   },
   {
    "role": "IT Manager"

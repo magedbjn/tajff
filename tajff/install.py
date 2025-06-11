@@ -1,6 +1,5 @@
 import frappe
 from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
-from frappe.custom.doctype.property_setter.property_setter import make_property_setter
 
 LOAN_CUSTOM_FIELDS = {
 	"Leave Application": [
@@ -14,6 +13,7 @@ LOAN_CUSTOM_FIELDS = {
 			"fieldname": "custom_travel_ticket",
 			"label": "Travel Ticket",
 			"fieldtype": "Check",
+			"default": 0,
 			"insert_after": "custom_travel",
 		},
 		{
@@ -40,6 +40,7 @@ LOAN_CUSTOM_FIELDS = {
 			"fieldname": "custom_return_visa",
 			"label": "Return Visa",
 			"fieldtype": "Check",
+			"default": 0,
 			"insert_after": "custom_column_break_mhfpk",
 		},
 		{
@@ -76,7 +77,6 @@ def after_install():
 
 def before_uninstall():
 	delete_custom_fields(LOAN_CUSTOM_FIELDS)
-
 
 def delete_custom_fields(custom_fields):
 	"""

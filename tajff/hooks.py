@@ -83,13 +83,11 @@ app_license = "mit"
 # ------------
 
 # before_install = "tajff.install.before_install"
-# after_install = "tajff.install.after_install"
+after_install = "tajff.install.after_install"
 
 # Uninstallation
-# ------------
-
-# before_uninstall = "tajff.uninstall.before_uninstall"
-# after_uninstall = "tajff.uninstall.after_uninstall"
+before_uninstall = "tajff.install.before_uninstall"
+# after_uninstall = "tajff.install.before_uninstall"
 
 # Integration Setup
 # ------------------
