@@ -26,8 +26,8 @@ def set_last_approved_record(doc, field_type):
             "employee": doc.employee,
             "docstatus": 1,
             "status": "Approved",
-            check_field: 1, 
-            status_field: ["!=", "Non-Reimbursable Expenses"],  
+            check_field: 1,
+            status_field: ["!=", "Non-Reimbursable Expense"],
             "name": ["!=", doc.name]
         },
         fields=["name", "from_date"],

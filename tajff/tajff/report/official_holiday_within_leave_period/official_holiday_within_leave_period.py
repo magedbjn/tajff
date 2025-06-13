@@ -8,13 +8,13 @@ from frappe.utils import add_days, cint, flt, getdate
 def execute(filters=None) -> tuple:
     if not filters:
         filters = {}
-        
+
     from_date = getdate(filters.get("from_date"))
     to_date = getdate(filters.get("to_date"))
-    
+
     if not from_date or not to_date:
         frappe.throw(_('"From Date" and "To Date" are required'))
-        
+
     if to_date <= from_date:
         frappe.throw(_('"From Date" must be before "To Date"'))
 
@@ -28,24 +28,25 @@ def get_columns():
             "fieldname": "id", 
             "label": _("ID"), 
             "fieldtype": "Data", 
-            "width": 150, 
-            "is_tree": True
+            "width": 200, 
+            "is_tree": True,
+            "hidden": 1
         },
         {
             "fieldname": "leave_application", 
             "label": _("Leave Application"), 
             "fieldtype": "Link", 
             "options": "Leave Application", 
-            "width": 150,
-            "hidden": 1
+            "width": 180,
+            "hidden": 0
         },
-        {"fieldname": "employee", "label": _("Employee"), "fieldtype": "Data", "width": 180},
+        {"fieldname": "employee", "label": _("Employee"), "fieldtype": "Data", "width": 130},
         {"fieldname": "employee_name", "label": _("Employee Name"), "fieldtype": "Data", "width": 200},
-        {"fieldname": "leave_type", "label": _("Leave Type"), "fieldtype": "Link", "options": "Leave Type", "width": 150},
+        {"fieldname": "leave_type", "label": _("Leave Type"), "fieldtype": "Data", "width": 120},
         {"fieldname": "from_date", "label": _("From Date"), "fieldtype": "Date", "width": 120},
         {"fieldname": "to_date", "label": _("To Date"), "fieldtype": "Date", "width": 120},
         {"fieldname": "holiday_list", "label": _("Holiday List"), "fieldtype": "Link", "options": "Holiday List", "width": 120},
-        {"fieldname": "holiday_count", "label": _("Total Holidays"), "fieldtype": "Int", "width": 100},
+        {"fieldname": "holiday_count", "label": _("Total Holidays"), "fieldtype": "Int", "width": 120},
         {"fieldname": "holiday_date", "label": _("Holiday Date"), "fieldtype": "Date", "width": 120},
         {"fieldname": "holiday_description", "label": _("Holiday Description"), "fieldtype": "Small Text", "width": 300}
     ]
@@ -79,7 +80,8 @@ def get_leave_applications(min_date, max_date):
             ["from_date", "<=", max_date],
             ["to_date", ">=", min_date],
             ["docstatus", "=", 1],
-            ["status", "=", "Approved"]
+            ["status", "=", "Approved"],
+            ["custom_overlapping_days_compensated", "=", 0]
         ],
         fields=["name", "employee", "employee_name", "from_date", "to_date", "leave_type"]
     )
@@ -123,7 +125,7 @@ def process_data(leave_applications, holiday_lists, holidays):
             continue
             
         # Create parent row for leave application
-        parent_id = f"LA-{la.name}"
+        parent_id = f"{la.name}"
         parent_row = {
             "id": parent_id,
             "leave_application": la.name,
@@ -148,7 +150,8 @@ def process_data(leave_applications, holiday_lists, holidays):
             child_id = f"{parent_id}-H{idx+1}"
             child_row = {
                 "id": child_id,
-                "leave_application": la.name,
+                #"leave_application": la.name,
+                "leave_application": "",
                 "employee": None,
                 "employee_name": None,
                 "leave_type": None,
