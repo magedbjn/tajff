@@ -1,9 +1,11 @@
 # Copyright (c) 2025, Maged BAjandooh and contributors
 # For license information, please see license.txt
-
+# التقرير يعرض الموظفين الذين آخذوا إجازة وتعارضت إجازتهم مع الإجازات الرسمية
+#Weekly_off التي تمت إضافتها إلى النظام بدون وضع علامه على 
 import frappe
+import json
 from frappe import _
-from frappe.utils import add_days, cint, flt, getdate
+from frappe.utils import getdate
 
 def execute(filters=None) -> tuple:
     if not filters:
@@ -24,22 +26,8 @@ def execute(filters=None) -> tuple:
 
 def get_columns():
     return [
-        {
-            "fieldname": "id", 
-            "label": _("ID"), 
-            "fieldtype": "Data", 
-            "width": 200, 
-            "is_tree": True,
-            "hidden": 1
-        },
-        {
-            "fieldname": "leave_application", 
-            "label": _("Leave Application"), 
-            "fieldtype": "Link", 
-            "options": "Leave Application", 
-            "width": 180,
-            "hidden": 0
-        },
+        {"fieldname": "id", "label": _("ID"), "fieldtype": "Data", "width": 200, "hidden": 1},
+        {"fieldname": "leave_application", "label": _("Leave Application"), "fieldtype": "Link", "options": "Leave Application", "width": 180},
         {"fieldname": "employee", "label": _("Employee"), "fieldtype": "Data", "width": 130},
         {"fieldname": "employee_name", "label": _("Employee Name"), "fieldtype": "Data", "width": 200},
         {"fieldname": "leave_type", "label": _("Leave Type"), "fieldtype": "Data", "width": 120},
@@ -48,7 +36,14 @@ def get_columns():
         {"fieldname": "holiday_list", "label": _("Holiday List"), "fieldtype": "Link", "options": "Holiday List", "width": 120},
         {"fieldname": "holiday_count", "label": _("Total Holidays"), "fieldtype": "Int", "width": 120},
         {"fieldname": "holiday_date", "label": _("Holiday Date"), "fieldtype": "Date", "width": 120},
-        {"fieldname": "holiday_description", "label": _("Holiday Description"), "fieldtype": "Small Text", "width": 300}
+        {"fieldname": "holiday_description", "label": _("Holiday Description"), "fieldtype": "Small Text", "width": 300},
+        # Last column: Action button (HTML)
+        {
+            "fieldname": "action",
+            "label": _("Action"),
+            "fieldtype": "HTML",
+            "width": 120,
+        }
     ]
 
 def get_data(filters):
@@ -108,6 +103,8 @@ def get_employee_holiday_lists(employees):
 
 def process_data(leave_applications, holiday_lists, holidays):
     data = []
+    module_path = "tajff.tajff.report.official_holiday_within_leave_period.official_holiday_within_leave_period" 
+
     holiday_dates = set(holidays.keys())
     
     for la in leave_applications:
@@ -123,7 +120,89 @@ def process_data(leave_applications, holiday_lists, holidays):
         
         if not overlapping_days:
             continue
-            
+
+        button_html = f"""
+        <button class='btn btn-xs btn-primary'
+            onclick='
+                const msg_html = `<div style="margin-bottom: 15px;">
+                    {_("Do you want to update compensated days?")}
+                    <div class="form-group" style="margin-top: 10px;">
+                        <input type="number" 
+                            id="comp_days_input" 
+                            class="form-control" 
+                            value="{len(overlapping_days)}"
+                            min="0"
+                            max="{len(overlapping_days)}"
+                            style="width: 100px; margin: 0 auto;"
+                        >
+                        <div class="text-muted small" style="margin-top: 5px;">
+                            {_("Maximum value: ")}{len(overlapping_days)}
+                        </div>
+                    </div>
+                </div>`;
+                
+                const dialog = new frappe.ui.Dialog({{
+                    title: __("Update Compensated Days"),
+                    fields: [{{
+                        fieldname: "message",
+                        fieldtype: "HTML",
+                        options: msg_html
+                    }}],
+                    primary_action_label: __("Update"),
+                    secondary_action_label: __("Remove"),
+                    primary_action: function() {{
+                        const days = $("#comp_days_input").val();
+                        if (days > maxDays) {{
+                            frappe.msgprint(__("Value cannot exceed maximum allowed days"));
+                            return;
+                        }}
+                        frappe.call({{
+                            method: "{module_path}.update_compensated_days",
+                            args: {{
+                                "leave_application": "{la.name}",
+                                "days_count": days
+                            }},
+                            callback: function(r) {{
+                                frappe.msgprint(r.message);
+                                frappe.query_report.refresh();
+                                dialog.hide();
+                            }}
+                        }});
+                    }},
+                    secondary_action: function() {{
+                        frappe.call({{
+                            method: "{module_path}.remove_compensated_days",
+                            args: {{
+                                "leave_application": "{la.name}"
+                            }},
+                            callback: function(r) {{
+                                frappe.msgprint(r.message);
+                                frappe.query_report.refresh();
+                                dialog.hide();
+                            }}
+                        }});
+                    }}
+                }});
+                
+                // Add custom cancel button
+                dialog.footer.find(".btn-secondary").after(
+                    `<button class="btn btn-default btn-sm">{_("Cancel")}</button>`
+                ).on("click", () => dialog.hide());
+                
+                // Show dialog and focus input
+                dialog.show();
+                setTimeout(() => {{
+                    $("#comp_days_input").focus().select();
+                    // Enforce max value on input
+                    $("#comp_days_input").on("input", function() {{
+                        if (this.value > maxDays) this.value = maxDays;
+                    }});
+                }}, 300);
+            '>
+            {_('Update')}
+        </button>
+        """
+
         # Create parent row for leave application
         parent_id = f"{la.name}"
         parent_row = {
@@ -138,9 +217,10 @@ def process_data(leave_applications, holiday_lists, holidays):
             "holiday_count": len(overlapping_days),
             "holiday_date": None,
             "holiday_description": None,
+            "action": button_html,
             "indent": 0,
             "has_children": 1,
-            "parent_id": None
+            "parent_id": None,
         }
         data.append(parent_row)
         
@@ -150,7 +230,6 @@ def process_data(leave_applications, holiday_lists, holidays):
             child_id = f"{parent_id}-H{idx+1}"
             child_row = {
                 "id": child_id,
-                #"leave_application": la.name,
                 "leave_application": "",
                 "employee": None,
                 "employee_name": None,
@@ -161,6 +240,7 @@ def process_data(leave_applications, holiday_lists, holidays):
                 "holiday_count": None,
                 "holiday_date": holiday_date,
                 "holiday_description": holidays[holiday_date],
+                "action": "",  # No button for child rows
                 "indent": 1,
                 "has_children": 0,
                 "parent_id": parent_id
@@ -168,3 +248,15 @@ def process_data(leave_applications, holiday_lists, holidays):
             data.append(child_row)
     
     return data
+
+@frappe.whitelist()
+def update_compensated_days(leave_application, days_count):
+    # Convert to int since input comes as string
+    days_count = int(days_count)
+    frappe.db.set_value("Leave Application", leave_application, "custom_overlapping_days_compensated", days_count)
+    return _("Compensated days updated to {0}").format(days_count)
+
+@frappe.whitelist()
+def remove_compensated_days(leave_application):
+    frappe.db.set_value("Leave Application", leave_application, "custom_overlapping_days_compensated", -1)
+    return _("Compensated days removed successfully")

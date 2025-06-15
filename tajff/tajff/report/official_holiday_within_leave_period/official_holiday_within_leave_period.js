@@ -1,8 +1,7 @@
 // Copyright (c) 2025, Maged BAjandooh and contributors
 // For license information, please see license.txt
-
 frappe.query_reports["Official Holiday Within Leave Period"] = {
-	filters: [
+    filters: [
         {
             fieldname: "from_date",
             label: __("From Date"),
@@ -24,4 +23,5 @@ frappe.query_reports["Official Holiday Within Leave Period"] = {
             options: "Employee",
         },
     ],
+    
 };
