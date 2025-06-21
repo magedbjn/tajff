@@ -1,7 +1,8 @@
 # Copyright (c) 2025, Maged BAjandooh and contributors
 # For license information, please see license.txt
 # التقرير يعرض الموظفين الذين آخذوا إجازة وتعارضت إجازتهم مع الإجازات الرسمية
-#Weekly_off التي تمت إضافتها إلى النظام بدون وضع علامه على 
+# Weekly_off التي تمت إضافتها إلى النظام بدون وضع علامه على
+
 import frappe
 import json
 from frappe import _

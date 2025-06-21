@@ -8,7 +8,7 @@ def after_install():
 		print("Setting up Tajff...")
 		setup()
 
-		click.secho("Thank you for installing Tajff!", fg="green")
+		click.secho("Thank you for installing Taj Food Factory for Ready Meals!", fg="green")
 
 	except Exception as e:
 		BUG_REPORT_URL = "https://github.com/frappe/hrms/issues/new"

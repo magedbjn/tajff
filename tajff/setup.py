@@ -10,94 +10,115 @@ from frappe.installer import update_site_config
 
 
 def after_install():
-	create_custom_fields(get_custom_fields(), ignore_validate=True)
-
+	create_taj_hrms_fields()
 
 def before_uninstall():
-	delete_custom_fields(get_custom_fields())
+	delete_custom_fields(get_taj_hrms_fields_fields())
 
+def create_taj_hrms_fields():
+	if "hrms" in frappe.get_installed_apps():
+		create_custom_fields(get_taj_hrms_fields_fields(), ignore_validate=True)
 
-def get_custom_fields():
-	"""Tajff specific custom fields that need to be added to the masters in ERPNext"""
+def get_taj_hrms_fields_fields():
 	return {
 		"Leave Application": [
-		{
-			"fieldname": "custom_overlapping_days_compensated",
-			"label": "Overlapping Days Compensated with Public Holidays",
-			"fieldtype": "Int",
-			"insert_after": "to_date",
-			"read_only": 1,
-			"depends_on": "eval:doc.custom_overlapping_days_compensated!=0",
-		},
-		{
-			"fieldname": "custom_travel",
-			"label": "Travel",
-			"fieldtype": "Tab Break",
-			"insert_after": "amended_from",
-		},
-		{
-			"fieldname": "custom_travel_ticket",
-			"label": "Travel Ticket",
-			"fieldtype": "Check",
-			"default": 0,
-			"insert_after": "custom_travel",
-		},
-		{
-			"fieldname": "custom_last_travel_ticket",
-			"label": "Last Travel Ticket",
-			"fieldtype": "Read Only",
-			"insert_after": "custom_travel_ticket",
-		},
-		{
-			"fieldname": "custom_status_travel_ticket",
-			"label": "Status Travel Ticket",
-			"fieldtype": "Select",
-			"insert_after": "custom_travel_ticket",
-			"options": "\nCovered by company\nReimbursable Expense\nNon-Reimbursable Expense",
-			"read_only_depends_on": "eval:doc.custom_travel_ticket==0",
-		},
-		{
-			"fieldname": "custom_column_break_mhfpk",
-			"label": "",
-			"fieldtype": "Column Break",
-			"insert_after": "custom_status_travel_ticket",
-		},
-		{
-			"fieldname": "custom_return_visa",
-			"label": "Return Visa",
-			"fieldtype": "Check",
-			"default": 0,
-			"insert_after": "custom_column_break_mhfpk",
-		},
-		{
-			"fieldname": "custom_last_return_visa",
-			"label": "Last Return Visa",
-			"fieldtype": "Read Only",
-			"insert_after": "custom_return_visa",
-		},
-		{
-			"fieldname": "custom_last_return_visa",
-			"label": "Status Return Visa",
-			"fieldtype": "Select",
-			"insert_after": "custom_return_visa",
-			"options": "\nCovered by company\nReimbursable Expense\nNon-Reimbursable Expense",
-			"read_only_depends_on": "eval:doc.custom_return_visa==0",
-		}
-	]
-}
-
-
-
-
-	docperms = data.get("doctypes")
-	if doc.role == "Employee Self Service" and "lending" in frappe.get_installed_apps():
-		docperms.update(get_lending_docperms_for_ess())
-
-	append_docperms_to_user_type(docperms, doc)
-
-	doc.flags.ignore_links = True
-	doc.save(ignore_permissions=True)
-
+			{
+				"fieldname": "taj_overlapping_days_compensated",
+				"label": "Overlapping Days Compensated with Public Holidays",
+				"fieldtype": "Data",
+				"insert_after": "to_date",
+				"read_only": 1,
+				"depends_on": "eval:doc.taj_overlapping_days_compensated!=0",
+			},
+			{
+				"fieldname": "taj_travel",
+				"label": "Travel",
+				"fieldtype": "Tab Break",
+				"insert_after": "amended_from",
+			},
+			{
+				"fieldname": "taj_travel_ticket",
+				"label": "Travel Ticket",
+				"fieldtype": "Check",
+				"default": 0,
+				"insert_after": "taj_travel",
+			},
+			{
+				"fieldname": "taj_last_travel_ticket",
+				"label": "Last Travel Ticket",
+				"fieldtype": "Read Only",
+				"insert_after": "taj_travel_ticket",
+			},
+			{
+				"fieldname": "taj_status_travel_ticket",
+				"label": "Status Travel Ticket",
+				"fieldtype": "Select",
+				"insert_after": "taj_travel_ticket",
+				"options": "\nCovered by company\nReimbursable Expense\nNon-Reimbursable Expense",
+				"read_only_depends_on": "eval:doc.taj_travel_ticket==0",
+			},
+			{
+				"fieldname": "taj_column_break_mhfpk",
+				"label": "",
+				"fieldtype": "Column Break",
+				"insert_after": "taj_status_travel_ticket",
+			},
+			{
+				"fieldname": "taj_return_visa",
+				"label": "Return Visa",
+				"fieldtype": "Check",
+				"default": 0,
+				"insert_after": "taj_column_break_mhfpk",
+			},
+			{
+				"fieldname": "taj_last_return_visa",
+				"label": "Last Return Visa",
+				"fieldtype": "Read Only",
+				"insert_after": "taj_return_visa",
+			},
+			{
+				"fieldname": "taj_last_return_visa",
+				"label": "Status Return Visa",
+				"fieldtype": "Select",
+				"insert_after": "taj_return_visa",
+				"options": "\nCovered by company\nReimbursable Expense\nNon-Reimbursable Expense",
+				"read_only_depends_on": "eval:doc.taj_return_visa==0",
+			}
+		],
+		"Gratuity": [
+			{
+				"fieldname": "taj_details",
+				"fieldtype": "Tab Break",
+				"label": _("Taj Details"),
+				"insert_after": "payable_Account",
+			},
+			{
+				"fieldname": "taj_date_of_joining",
+				"fieldtype": "Date",
+				"label": _("Date of Joining"),
+				"read_only": 1,
+				"fetch_from": "employee.date_of_joining", 
+    			"fetch_if_empty": 1,  
+				"insert_after": "taj_details",
+			},
+			{
+				"fieldname": "taj_relieving_date",
+				"fieldtype": "Date",
+				"label": _("Relieving Date"),
+				"read_only": 1,
+				"fetch_from": "employee.relieving_date", 
+    			"fetch_if_empty": 1,  			
+				"insert_after": "taj_date_of_joining",
+			},
+			{
+				"fieldname": "taj_salary",
+				"label": "Salary",
+				"fieldtype": "Currency",
+				"read_only": 1,
+				"insert_after": "taj_relieving_date",
+			}
+		],
+	}
 
 def delete_custom_fields(custom_fields: dict):
 	"""

@@ -127,9 +127,10 @@ before_uninstall = "tajff.uninstall.before_uninstall"
 # ---------------
 # Override standard doctype classes
 
-# override_doctype_class = {
-# 	"ToDo": "custom_app.overrides.CustomToDo"
-# }
+override_doctype_class = {                
+	"Gratuity": "tajff.overrides.gratuity.Gratuity_new",
+    "Party Specific Item": "tajff.overrides.party_specific_item.PartySpecificItem_New"
+}
 
 # Document Events
 # ---------------
@@ -143,6 +144,9 @@ doc_events = {
         "before_save": "tajff.custom.leave_Application.before_save",
         "before_submit": "tajff.custom.leave_Application.validate_employee"
 	},
+    "Gratuity": {
+        "before_save": "tajff.overrides.gratuity.get_employee_details"
+    },
     # "Licenses":{
     #     'before_save': "tajff.documents.doctype.licenses.licenses.before_save",
     #     'on_update': "tajff.documents.doctype.licenses.licenses.on_update"
@@ -252,13 +256,13 @@ scheduler_events = {
 # }
 
 fixtures = [
-    {"doctype": "Client Script",},
-    {"doctype": "Server Script",},
+    # {"doctype": "Client Script",},
+    # {"doctype": "Server Script",},
     #{"doctype": "Custom Field",},
     {"doctype": "Custom Field","filters": [
         [
             "dt", "in", [
-                "Leave Application"
+                "Gratuity"
 			]
 		]
 	]},

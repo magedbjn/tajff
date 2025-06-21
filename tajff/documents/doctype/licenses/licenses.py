@@ -1,5 +1,6 @@
 # Copyright (c) 2025, Maged BAjandooh and contributors
 # For license information, please see license.txt
+# إضافة عناوين الرخص ومتى تنتهي هذه الرخص
 
 import frappe
 from frappe.model.document import Document

@@ -1,10 +1,11 @@
 import frappe
 from frappe import _, bold
-from frappe.utils import get_datetime, get_link_to_form
+from frappe.utils import get_datetime, getdate, get_link_to_form
 from hrms.payroll.doctype.gratuity.gratuity import Gratuity
-
+from dateutil.relativedelta import relativedelta
 
 class Gratuity_new(Gratuity):
+    # عدم خصم أيام الغياب و طلب إجازة بدون راتب من نهاية الخدمة
     def get_total_working_days(self) -> float:
         # We don't want to deduct the days of Absent and LWP leave from days of end of service
         date_of_joining, relieving_date = frappe.db.get_value(
@@ -28,4 +29,13 @@ class Gratuity_new(Gratuity):
 		# 	total_absent = self.get_non_working_days(relieving_date, "Absent")
 		# 	total_working_days -= total_absent
 
-		return total_working_days
+		#return total_working_days
+
+
+def get_employee_details(doc, method=None):
+    get_salary_slip(doc)
+
+def get_salary_slip(doc, method=None):
+    doc.taj_salary = doc.get_total_component_amount()
+
+   

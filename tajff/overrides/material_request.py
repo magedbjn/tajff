@@ -1,3 +1,4 @@
+# جمع ودمج العناصر المتشابهة
 import frappe
 from frappe import _
 

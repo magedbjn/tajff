@@ -4,6 +4,7 @@
 import frappe
 from frappe.model.document import Document
 
+
 class Visitor(Document):
     def validate(self):
         # Check for duplicate visitor entries (same email + date)
