@@ -32,10 +32,110 @@ class Gratuity_new(Gratuity):
 		#return total_working_days
 
 
+
 def get_employee_details(doc, method=None):
     get_salary_slip(doc)
+
+    date_of_joining = doc.taj_date_of_joining
+    relieving_date = doc.taj_relieving_date
+    
+    # حساب سنوات الخبرة بدقة
+    experience = calculate_experience(
+        date_of_joining,
+        relieving_date
+    )
+    total_years = experience["years"]
+    
+    # مسح السجلات القديمة
+    doc.taj_gratuity_details = []
+    
+    # الحصول على شرائح قاعدة المنحة
+    slabs = doc.get_gratuity_rule_slabs()
+    
+    # توزيع سنوات الخبرة على الشرائح
+    remaining_years = total_years
+    last_used_slab = None
+    
+    for slab in slabs:
+        if remaining_years <= 0:
+            break
+            
+        slab_length = slab.to_year - slab.from_year
+        
+        if remaining_years >= slab_length:
+            # إضافة الشريحة كاملة
+            doc.append("taj_gratuity_details", {
+                "gratuity_rule": f"{slab.from_year} to {slab.to_year} Years",
+                "years_of_experience": slab_length,
+                "amount": doc.taj_salary * slab.fraction_of_applicable_earnings,
+                "total_amount": doc.taj_salary * slab.fraction_of_applicable_earnings * slab_length
+            })
+            remaining_years -= slab_length
+            last_used_slab = slab  # تحديث آخر شريحة مستخدمة
+        else:
+            # إضافة جزء من الشريحة
+            doc.append("taj_gratuity_details", {
+                "gratuity_rule": f"{slab.from_year} to {slab.to_year} Years",
+                "years_of_experience": remaining_years,
+                "amount": doc.taj_salary * slab.fraction_of_applicable_earnings,
+                "total_amount": doc.taj_salary * slab.fraction_of_applicable_earnings * remaining_years
+            })
+            last_used_slab = slab  # تحديث آخر شريحة مستخدمة
+            remaining_years = 0
+            break
+        
+    # إذا باقي سنوات والقاعدة غير متوفرة
+    if remaining_years > 0:
+        doc.append("taj_gratuity_details", {
+                "gratuity_rule": f"Can't found Years",
+                "years_of_experience": remaining_years,
+                "amount": doc.taj_salary * slab.fraction_of_applicable_earnings,
+                "total_amount": doc.taj_salary * slab.fraction_of_applicable_earnings * remaining_years
+        })
+
+    # حساب الشهور والأيام فقط إذا كانت هناك شريحة مستخدمة
+    fraction = last_used_slab.fraction_of_applicable_earnings
+    monthly_rate = doc.taj_salary * fraction / 12
+    daily_rate = monthly_rate / 30
+      
+        # إضافة الشهور إذا كانت موجودة
+    if experience["months"] > 0:
+        doc.append("taj_gratuity_details", {
+            "gratuity_rule": "Months",
+            "years_of_experience": experience["months"],
+            "amount": monthly_rate,
+            "total_amount": monthly_rate * experience["months"]
+        })
+        
+     # إضافة الأيام إذا كانت موجودة
+    if experience["days"] > 0:
+        doc.append("taj_gratuity_details", {
+            "gratuity_rule": "Days",
+            "years_of_experience": experience["days"],
+            "amount": daily_rate,
+            "total_amount": daily_rate * experience["days"]
+        })   
+
+def calculate_experience(date_of_joining, relieving_date=None):
+    """
+    حساب سنوات الخبرة بين تاريخين بدقة
+    """
+    from dateutil.relativedelta import relativedelta
+    from frappe.utils import getdate
+    
+    start_date = getdate(date_of_joining)
+    end_date = getdate(relieving_date) if relieving_date else getdate()
+    
+    if end_date < start_date:
+        return {"years": 0, "months": 0, "days": 0}
+    
+    delta = relativedelta(end_date, start_date)
+    return {
+        "years": delta.years,
+        "months": delta.months,
+        "days": delta.days
+    }
 
 def get_salary_slip(doc, method=None):
     doc.taj_salary = doc.get_total_component_amount()
 
-   

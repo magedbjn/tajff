@@ -2,7 +2,7 @@ app_name = "tajff"
 app_title = "Taj Food Factory"
 app_publisher = "Maged BAjandooh"
 app_description = "Taj Food Factory for Ready Meals"
-app_email = "m.bajandooh@tajff.com"
+app_email = "m.bajandooh@tajff.sa"
 app_license = "mit"
 
 # Apps
@@ -26,7 +26,7 @@ app_license = "mit"
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/tajff/css/tajff.css"
-# app_include_js = "/assets/tajff/js/tajff.js"
+# app_include_js = "/assets/tajff/js/payroll_entry.js"
 
 # include js, css files in header of web template
 # web_include_css = "/assets/tajff/css/tajff.css"
@@ -47,7 +47,9 @@ app_license = "mit"
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
-
+doctype_js = {
+    "Payroll Entry": "public/js/payroll_entry.js"
+}
 # Svg Icons
 # ------------------
 # include app icons in desk
@@ -129,7 +131,7 @@ before_uninstall = "tajff.uninstall.before_uninstall"
 
 override_doctype_class = {                
 	"Gratuity": "tajff.overrides.gratuity.Gratuity_new",
-    "Party Specific Item": "tajff.overrides.party_specific_item.PartySpecificItem_New"
+    "Payroll Entry": "tajff.overrides.payroll_entry.PayrollEntry_New",
 }
 
 # Document Events

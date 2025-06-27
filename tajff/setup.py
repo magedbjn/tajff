@@ -116,7 +116,15 @@ def get_taj_hrms_fields_fields():
 				"fieldtype": "Currency",
 				"read_only": 1,
 				"insert_after": "taj_relieving_date",
-			}
+			},
+			{
+				"fieldname": "taj_gratuity_details",
+				"fieldtype": "Table",
+				"label": _("Gratuity Details"),
+				"options": "Taj Gratuity Details", 
+				"read_only": 1,		
+				"insert_after": "taj_salary",
+			},
 		],
 	}
 
