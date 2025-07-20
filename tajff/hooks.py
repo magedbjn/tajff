@@ -48,7 +48,10 @@ app_license = "mit"
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
 doctype_js = {
-    "Payroll Entry": "public/js/payroll_entry.js"
+    "Material Request": "public/js/material_request.js",
+    "Purchase Order": "public/js/uom_check.js",
+    "Purchase Receipt": "public/js/uom_check.js",
+    "Purchase Invoice": "public/js/uom_check.js"
 }
 # Svg Icons
 # ------------------
@@ -147,7 +150,8 @@ doc_events = {
         "before_submit": "tajff.custom.leave_Application.validate_employee"
 	},
     "Gratuity": {
-        "before_save": "tajff.overrides.gratuity.get_employee_details"
+        # "before_save": "tajff.overrides.gratuity.get_employee_details",
+        "validate": "tajff.overrides.gratuity.get_employee_details"
     },
     # "Licenses":{
     #     'before_save': "tajff.documents.doctype.licenses.licenses.before_save",

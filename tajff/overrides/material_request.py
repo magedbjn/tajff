@@ -1,33 +1,32 @@
-# جمع ودمج العناصر المتشابهة
+# تجميع العناصر المتشابهة و تحديث الكميات
+
 import frappe
 from frappe import _
 
 @frappe.whitelist()
-def collect_similar_items(doc):
-    # Initialize data structures
+def collect_similar_items(docname):
+    doc = frappe.get_doc("Material Request", docname)
+
     total_quantities = {}
     items_to_delete = []
 
-    # First pass: Collect quantities and identify duplicates
     for item in doc.items:
         item_code = item.item_code
-        
         if item_code in total_quantities:
-            # Accumulate quantity for duplicate items
             total_quantities[item_code] += item.qty
-            # Mark duplicate item for removal
             items_to_delete.append(item)
         else:
-            # Initialize for new item code
             total_quantities[item_code] = item.qty
 
-    # Second pass: Remove duplicate items (in reverse order)
+    # Remove duplicates
     for item in reversed(items_to_delete):
         doc.remove(item)
 
-    # Third pass: Update quantities for remaining items
+    # Update remaining items
     for item in doc.items:
         if item.item_code in total_quantities:
             item.qty = total_quantities[item.item_code]
-            # Remove from dict to prevent re-updating
             del total_quantities[item.item_code]
+
+    doc.save()
+    frappe.msgprint(_("Similar items were collected and quantities updated."))

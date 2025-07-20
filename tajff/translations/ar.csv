@@ -9,6 +9,13 @@ Reimbursable Expense,نفقه الموظف ويتم تعويضه
 Non-Reimbursable Expense,نفقه الموظغ ولايعوض
 Last Travel Ticket,آخر تذكرة سفر
 last_return_visa,آخر فيزا عودة
+Gratuity Details,تفيصل نهاية المكافأة
+Years of Experience,سنوات الخبرة
+Gratuity Rule,قاعدة المكافأة
+Collect Similar Items,دمج العناصر المتشابهة
+Similar items were collected and quantities updated.,تم جمع العناصر المتشابهة وتحديث الكميات.
+UOM Mismatch Detected,تم اكتشاف تعارض في وحدات القياس
+"In row {0}, item <b>{1}</b> has a Unit of Measure ({2}) different from its Stock UOM ({3}), and the Conversion Factor is 1. This may be incorrect. Please review before saving.","في الصف {0}، الصنف <b>{1}</b> لديه وحدة قياس ({2}) تختلف عن وحدة التخزين ({3})، ومعامل التحويل = 1. قد يكون هذا غير صحيح، يرجى المراجعة قبل الحفظ."
 Licenses,الرخص
 Licenses Type,أنواع الرخص
 License English,الرخصه بالإنجليزي

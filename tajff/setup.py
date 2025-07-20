@@ -1,12 +1,12 @@
-import os
+# import os
 
-import frappe
+from frappe import _
 from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
-from frappe.desk.page.setup_wizard.install_fixtures import (
-	_,  # NOTE: this is not the real translation function
-)
-from frappe.desk.page.setup_wizard.setup_wizard import make_records
-from frappe.installer import update_site_config
+# from frappe.desk.page.setup_wizard.install_fixtures import (
+# 	_,  # NOTE: this is not the real translation function
+# )
+# from frappe.desk.page.setup_wizard.setup_wizard import make_records
+# from frappe.installer import update_site_config
 
 
 def after_install():
@@ -24,7 +24,7 @@ def get_taj_hrms_fields_fields():
 		"Leave Application": [
 			{
 				"fieldname": "taj_overlapping_days_compensated",
-				"label": "Overlapping Days Compensated with Public Holidays",
+				"label": _("Overlapping Days Compensated with Public Holidays"),
 				"fieldtype": "Data",
 				"insert_after": "to_date",
 				"read_only": 1,
@@ -32,28 +32,28 @@ def get_taj_hrms_fields_fields():
 			},
 			{
 				"fieldname": "taj_travel",
-				"label": "Travel",
+				"label": _("Travel"),
 				"fieldtype": "Tab Break",
 				"insert_after": "amended_from",
 			},
 			{
 				"fieldname": "taj_travel_ticket",
-				"label": "Travel Ticket",
+				"label": _("Travel Ticket"),
 				"fieldtype": "Check",
 				"default": 0,
 				"insert_after": "taj_travel",
 			},
 			{
 				"fieldname": "taj_last_travel_ticket",
-				"label": "Last Travel Ticket",
+				"label": _("Last Travel Ticket"),
 				"fieldtype": "Read Only",
 				"insert_after": "taj_travel_ticket",
 			},
 			{
 				"fieldname": "taj_status_travel_ticket",
-				"label": "Status Travel Ticket",
+				"label": _("Status Travel Ticket"),
 				"fieldtype": "Select",
-				"insert_after": "taj_travel_ticket",
+				"insert_after": "taj_last_travel_ticket",
 				"options": "\nCovered by company\nReimbursable Expense\nNon-Reimbursable Expense",
 				"read_only_depends_on": "eval:doc.taj_travel_ticket==0",
 			},
@@ -65,22 +65,22 @@ def get_taj_hrms_fields_fields():
 			},
 			{
 				"fieldname": "taj_return_visa",
-				"label": "Return Visa",
+				"label": _("Return Visa"),
 				"fieldtype": "Check",
 				"default": 0,
 				"insert_after": "taj_column_break_mhfpk",
 			},
 			{
 				"fieldname": "taj_last_return_visa",
-				"label": "Last Return Visa",
+				"label": _("Last Return Visa"),
 				"fieldtype": "Read Only",
 				"insert_after": "taj_return_visa",
 			},
 			{
-				"fieldname": "taj_last_return_visa",
-				"label": "Status Return Visa",
+				"fieldname": "taj_status_return_visa",
+				"label": _("Status Return Visa"),
 				"fieldtype": "Select",
-				"insert_after": "taj_return_visa",
+				"insert_after": "taj_last_return_visa",
 				"options": "\nCovered by company\nReimbursable Expense\nNon-Reimbursable Expense",
 				"read_only_depends_on": "eval:doc.taj_return_visa==0",
 			}
@@ -111,11 +111,23 @@ def get_taj_hrms_fields_fields():
 				"insert_after": "taj_date_of_joining",
 			},
 			{
+				"fieldname": "taj_column_1",
+				"label": "",
+				"fieldtype": "Column Break",
+				"insert_after": "taj_relieving_date",
+			},
+			{
 				"fieldname": "taj_salary",
-				"label": "Salary",
+				"label": _("Salary"),
 				"fieldtype": "Currency",
 				"read_only": 1,
-				"insert_after": "taj_relieving_date",
+				"insert_after": "taj_column_1",
+			},
+			{
+				"fieldname": "taj_section_1",
+				"label": "",
+				"fieldtype": "Section Break",
+				"insert_after": "taj_salary",
 			},
 			{
 				"fieldname": "taj_gratuity_details",
@@ -123,7 +135,7 @@ def get_taj_hrms_fields_fields():
 				"label": _("Gratuity Details"),
 				"options": "Taj Gratuity Details", 
 				"read_only": 1,		
-				"insert_after": "taj_salary",
+				"insert_after": "taj_section_1",
 			},
 		],
 	}
