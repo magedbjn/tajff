@@ -1,20 +1,18 @@
 {
  "actions": [],
  "allow_import": 1,
- "autoname": "naming_series:",
+ "autoname": "field:item_code",
  "creation": "2024-08-07 12:34:14.177606",
  "doctype": "DocType",
  "document_type": "Document",
  "engine": "InnoDB",
  "field_order": [
   "tab_break_9juh",
-  "naming_series",
   "item_code",
   "item_english",
   "item_arabic",
   "column_break_kehy",
   "status",
-  "amended_from",
   "specification_tab",
   "sb",
   "column_break_yraz",
@@ -69,16 +67,6 @@
   "sulfite"
  ],
  "fields": [
-  {
-   "fieldname": "amended_from",
-   "fieldtype": "Link",
-   "label": "Amended From",
-   "no_copy": 1,
-   "options": "Raw Material Specification",
-   "print_hide": 1,
-   "read_only": 1,
-   "search_index": 1
-  },
   {
    "fieldname": "specification_column",
    "fieldtype": "Column Break"
@@ -263,6 +251,7 @@
    "label": "Sulfite"
   },
   {
+   "fetch_from": "item_code.item_name",
    "fieldname": "item_english",
    "fieldtype": "Read Only",
    "in_filter": 1,
@@ -271,6 +260,7 @@
    "label": "Item English"
   },
   {
+   "fetch_from": "item_code.item_name_arabic",
    "fieldname": "item_arabic",
    "fieldtype": "Read Only",
    "in_filter": 1,
@@ -340,13 +330,14 @@
   },
   {
    "default": "Open",
+   "description": "Rejected: Purchasing or using  in manufacturing is not allowed",
    "fieldname": "status",
    "fieldtype": "Select",
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Status",
    "no_copy": 1,
-   "options": "Open\nApproved\nRejected\nCancelled",
+   "options": "Open\nApproved\nRejected",
    "reqd": 1,
    "search_index": 1
   },
@@ -356,7 +347,8 @@
    "in_filter": 1,
    "label": "Item Code",
    "options": "Item",
-   "reqd": 1
+   "reqd": 1,
+   "unique": 1
   },
   {
    "fieldname": "column_break_zvgl",
@@ -365,13 +357,6 @@
   {
    "fieldname": "column_break_vblq",
    "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "naming_series",
-   "fieldtype": "Select",
-   "label": "Series",
-   "options": "QC-RMS-.####",
-   "reqd": 1
   },
   {
    "fieldname": "specification_tab",
@@ -402,17 +387,15 @@
    "label": "Allergic"
   }
  ],
- "is_submittable": 1,
  "links": [],
- "modified": "2025-06-10 08:25:04.295069",
- "modified_by": "m.bajandooh@tajff.com",
+ "modified": "2025-07-20 22:21:44.479323",
+ "modified_by": "Administrator",
  "module": "QC",
  "name": "Raw Material Specification",
- "naming_rule": "By \"Naming Series\" field",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
-   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,
@@ -424,7 +407,6 @@
    "role": "System Manager",
    "select": 1,
    "share": 1,
-   "submit": 1,
    "write": 1
   },
   {
@@ -439,7 +421,6 @@
    "write": 1
   },
   {
-   "cancel": 1,
    "create": 1,
    "email": 1,
    "export": 1,
@@ -450,7 +431,6 @@
    "role": "Quality Manager",
    "select": 1,
    "share": 1,
-   "submit": 1,
    "write": 1
   },
   {

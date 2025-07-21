@@ -51,7 +51,8 @@ doctype_js = {
     "Material Request": "public/js/material_request.js",
     "Purchase Order": "public/js/uom_check.js",
     "Purchase Receipt": "public/js/uom_check.js",
-    "Purchase Invoice": "public/js/uom_check.js"
+    "Purchase Invoice": "public/js/uom_check.js",
+    "Item": "public/js/raw_material_specification.js"
 }
 # Svg Icons
 # ------------------
@@ -135,6 +136,7 @@ before_uninstall = "tajff.uninstall.before_uninstall"
 override_doctype_class = {                
 	"Gratuity": "tajff.overrides.gratuity.Gratuity_new",
     "Payroll Entry": "tajff.overrides.payroll_entry.PayrollEntry_New",
+    "Party Specific Item": "tajff.overrides.party_specific_item.TajPartySpecificItem"
 }
 
 # Document Events
@@ -143,7 +145,7 @@ override_doctype_class = {
 
 doc_events = {
     "Item":{
-        'validate': "tajff.qc.doctype.raw_material_specification.override.item.raw_material_speceification"
+        'validate': "tajff.qc.doctype.raw_material_specification.override.item.raw_material_specification"
     },
     "Leave Application": {
         "before_save": "tajff.custom.leave_Application.before_save",
