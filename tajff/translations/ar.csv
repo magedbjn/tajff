@@ -16,6 +16,8 @@ Collect Similar Items,دمج العناصر المتشابهة
 Similar items were collected and quantities updated.,تم جمع العناصر المتشابهة وتحديث الكميات.
 UOM Mismatch Detected,تم اكتشاف تعارض في وحدات القياس
 "In row {0}, item <b>{1}</b> has a Unit of Measure ({2}) different from its Stock UOM ({3}), and the Conversion Factor is 1. This may be incorrect. Please review before saving.","في الصف {0}، الصنف <b>{1}</b> لديه وحدة قياس ({2}) تختلف عن وحدة التخزين ({3})، ومعامل التحويل = 1. قد يكون هذا غير صحيح، يرجى المراجعة قبل الحفظ."
+The item has already been added.,الصنف مضاف مسبقًا
+Row {0}: Maximum Temperature must be equal to or greater than Minimum Temperature.,الصف رقم {0}: يجب أن تكون درجة الحرارة العظمى مساوية أو أكبر من درجة الحرارة الصغرى
 Licenses,الرخص
 Licenses Type,أنواع الرخص
 License English,الرخصه بالإنجليزي

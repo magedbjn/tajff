@@ -71,16 +71,20 @@ def get_holidays(filters):
     return {h.holiday_date: h.description for h in holiday_data}
 
 def get_leave_applications(min_date, max_date):
-    return frappe.db.get_all("Leave Application",
-        filters=[
-            ["from_date", "<=", max_date],
-            ["to_date", ">=", min_date],
-            ["docstatus", "=", 1],
-            ["status", "=", "Approved"],
-            ["custom_overlapping_days_compensated", "=", 0]
-        ],
-        fields=["name", "employee", "employee_name", "from_date", "to_date", "leave_type"]
-    )
+    query = """
+        SELECT name, employee, employee_name, from_date, to_date, leave_type
+        FROM `tabLeave Application`
+        WHERE from_date <= %s
+          AND to_date >= %s
+          AND docstatus = 1
+          AND status = 'Approved'
+          AND (taj_overlapping_days_compensated IS NULL)
+          AND leave_type IN (
+              SELECT name FROM `tabLeave Type`
+              WHERE taj_overlapping_days_compensated = 1
+          )
+    """
+    return frappe.db.sql(query, (max_date, min_date), as_dict=True)
 
 def get_employee_holiday_lists(employees):
     employee_data = frappe.db.get_all("Employee",
@@ -254,10 +258,10 @@ def process_data(leave_applications, holiday_lists, holidays):
 def update_compensated_days(leave_application, days_count):
     # Convert to int since input comes as string
     days_count = int(days_count)
-    frappe.db.set_value("Leave Application", leave_application, "custom_overlapping_days_compensated", days_count)
+    frappe.db.set_value("Leave Application", leave_application, "taj_overlapping_days_compensated", days_count)
     return _("Compensated days updated to {0}").format(days_count)
 
 @frappe.whitelist()
 def remove_compensated_days(leave_application):
-    frappe.db.set_value("Leave Application", leave_application, "custom_overlapping_days_compensated", -1)
+    frappe.db.set_value("Leave Application", leave_application, "taj_overlapping_days_compensated", 0)
     return _("Compensated days removed successfully")

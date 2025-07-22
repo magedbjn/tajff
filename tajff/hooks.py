@@ -52,7 +52,8 @@ doctype_js = {
     "Purchase Order": "public/js/uom_check.js",
     "Purchase Receipt": "public/js/uom_check.js",
     "Purchase Invoice": "public/js/uom_check.js",
-    "Item": "public/js/raw_material_specification.js"
+    "Item": "public/js/raw_material_specification.js",
+    "BOM": "public/js/bom_operation.js"
 }
 # Svg Icons
 # ------------------
@@ -152,8 +153,7 @@ doc_events = {
         "before_submit": "tajff.custom.leave_Application.validate_employee"
 	},
     "Gratuity": {
-        # "before_save": "tajff.overrides.gratuity.get_employee_details",
-        "validate": "tajff.overrides.gratuity.get_employee_details"
+        "validate": "tajff.overrides.gratuity.get_employee_details",
     },
     # "Licenses":{
     #     'before_save': "tajff.documents.doctype.licenses.licenses.before_save",
@@ -264,22 +264,10 @@ scheduler_events = {
 # }
 
 fixtures = [
-    # {"doctype": "Client Script",},
-    # {"doctype": "Server Script",},
-    #{"doctype": "Custom Field",},
-    {"doctype": "Custom Field","filters": [
-        [
-            "dt", "in", [
-                "Gratuity"
-			]
-		]
-	]},
-    # {"doctype": "Item", "filters": 
-    #  [["custom_raw_material_specification", "in", [
-    #     "Rejected","Approved"
-    # ]]]},
-#    {"doctype": "Custom Field", "filters": [["name", "in", [
-#        "Item-custom_raw_material_specification",
-#        "Item-item_name_arabic",
-#    ]]]},
+    {
+        "doctype": "Report",
+        "filters": {
+            "name": ["in", ["Official Holiday Within Leave Period"]]
+        }
+    }
 ]

@@ -77,7 +77,7 @@ def get_employee_details(doc, method=None):
         })
     elif remaining_years > 0:
         doc.append("taj_gratuity_details", {
-            "gratuity_rule": _("Can't found rules"),
+            "gratuity_rule": _("No Matching Rule Found"),
             "total_experience": remaining_years,
             "amount": 0,
             "total_amount": 0

@@ -22,6 +22,14 @@ def create_taj_hrms_fields():
 
 def get_taj_hrms_fields_fields():
 	return {
+		"Leave Type": [
+			{
+				"fieldname": "taj_overlapping_days_compensated",
+				"fieldtype": "Check",
+				"label": _("Taj-Overlapping Days Compensated with Public Holidays"),
+				"insert_after": "is_compensatory",
+			},
+		],
 		"Leave Application": [
 			{
 				"fieldname": "taj_overlapping_days_compensated",
@@ -29,7 +37,6 @@ def get_taj_hrms_fields_fields():
 				"fieldtype": "Data",
 				"insert_after": "to_date",
 				"read_only": 1,
-				"depends_on": "eval:doc.taj_overlapping_days_compensated!=0",
 			},
 			{
 				"fieldname": "taj_travel",
@@ -137,6 +144,20 @@ def get_taj_hrms_fields_fields():
 				"options": "Taj Gratuity Details", 
 				"read_only": 1,		
 				"insert_after": "taj_section_1",
+			},
+		],
+		"BOM Operation": [
+			{
+				"fieldname": "taj_min_temperature",
+				"fieldtype": "Float",
+				"label": _("Minimum Temperature"),
+				"insert_after": "image",
+			},
+			{
+				"fieldname": "taj_max_temperature",
+				"fieldtype": "Float",
+				"label": _("Maximum Temperature"),
+				"insert_after": "min_temperature",
 			},
 		],
 	}

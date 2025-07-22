@@ -1,6 +1,8 @@
+// الزر يظهر فقط قبل الاعتماد
+
 frappe.ui.form.on('Material Request', {
     refresh: function (frm) {
-        if (!frm.doc.__islocal) {
+        if (!frm.doc.__islocal && frm.doc.docstatus === 0) {
             frm.add_custom_button(__('Collect Similar Items'), function () {
                 frappe.call({
                     method: 'tajff.overrides.material_request.collect_similar_items',
@@ -13,7 +15,7 @@ frappe.ui.form.on('Material Request', {
                         }
                     }
                 });
-            }, __('Taj')); // هذا يضيف الزر تحت مجموعة باسم "Taj"
+            }, __('Taj'));
         }
     }
 });
