@@ -1,28 +1,24 @@
-# Copyright (c) 2025, Maged BAjandooh and contributors
-# For license information, please see license.txt
+# Copyright (c) 2025, Maged Bajandooh
 # التقرير يعرض الموظفين الذين آخذوا إجازة وتعارضت إجازتهم مع الإجازات الرسمية
-# Weekly_off التي تمت إضافتها إلى النظام بدون وضع علامه على
-
+# الإجازات الرسمية المدخله في النظام 
+# Holiday List => weekly_off= False
 import frappe
-import json
 from frappe import _
-from frappe.utils import getdate
+from frappe.utils import getdate, today
 
-def execute(filters=None) -> tuple:
-    if not filters:
-        filters = {}
-
+def execute(filters=None):
+    filters = filters or {}
     from_date = getdate(filters.get("from_date"))
     to_date = getdate(filters.get("to_date"))
 
     if not from_date or not to_date:
-        frappe.throw(_('"From Date" and "To Date" are required'))
+        frappe.throw(_("Both 'From Date' and 'To Date' are required"))
 
     if to_date <= from_date:
-        frappe.throw(_('"From Date" must be before "To Date"'))
+        frappe.throw(_("'To Date' must be after 'From Date'"))
 
     columns = get_columns()
-    data = get_data(filters)
+    data = get_data(filters, from_date, to_date)
     return columns, data
 
 def get_columns():
@@ -38,149 +34,104 @@ def get_columns():
         {"fieldname": "holiday_count", "label": _("Total Holidays"), "fieldtype": "Int", "width": 120},
         {"fieldname": "holiday_date", "label": _("Holiday Date"), "fieldtype": "Date", "width": 120},
         {"fieldname": "holiday_description", "label": _("Holiday Description"), "fieldtype": "Small Text", "width": 300},
-        # Last column: Action button (HTML)
-        {
-            "fieldname": "action",
-            "label": _("Action"),
-            "fieldtype": "HTML",
-            "width": 120,
-        }
+        {"fieldname": "action", "label": _("Action"), "fieldtype": "HTML", "width": 120},
     ]
 
-def get_data(filters):
-    holidays = get_holidays(filters)
+def get_data(filters, from_date, to_date):
+    holidays = {
+        h.holiday_date: h.description for h in frappe.get_all(
+            "Holiday",
+            filters={"weekly_off": 0, "holiday_date": ["between", [from_date, to_date]]},
+            fields=["holiday_date", "description"]
+        )
+    }
+
     if not holidays:
         return []
-        
+
     min_holiday = min(holidays.keys())
     max_holiday = max(holidays.keys())
-    
-    leave_applications = get_leave_applications(min_holiday, max_holiday)
-    employee_holiday_lists = get_employee_holiday_lists([la.employee for la in leave_applications])
-    
-    return process_data(leave_applications, employee_holiday_lists, holidays)
 
-def get_holidays(filters):
-    holiday_data = frappe.db.sql("""
-        SELECT holiday_date, description
-        FROM `tabHoliday`
-        WHERE weekly_off = 0
-            AND holiday_date BETWEEN %(from_date)s AND %(to_date)s
-    """, filters, as_dict=1)
-    
-    return {h.holiday_date: h.description for h in holiday_data}
-
-def get_leave_applications(min_date, max_date):
-    query = """
+    leave_applications = frappe.db.sql("""
         SELECT name, employee, employee_name, from_date, to_date, leave_type
         FROM `tabLeave Application`
-        WHERE from_date <= %s
-          AND to_date >= %s
-          AND docstatus = 1
-          AND status = 'Approved'
-          AND (taj_overlapping_days_compensated IS NULL)
+        WHERE from_date <= %s AND to_date >= %s
+          AND docstatus = 1 AND status = 'Approved'
+          AND taj_overlapping_days_compensated IS NULL
           AND leave_type IN (
               SELECT name FROM `tabLeave Type`
               WHERE taj_overlapping_days_compensated = 1
           )
-    """
-    return frappe.db.sql(query, (max_date, min_date), as_dict=True)
+    """, (max_holiday, min_holiday), as_dict=True)
 
-def get_employee_holiday_lists(employees):
-    employee_data = frappe.db.get_all("Employee",
-        filters={"name": ("in", employees)},
+    employee_data = frappe.get_all("Employee",
+        filters={"name": ["in", [la.employee for la in leave_applications]]},
         fields=["name", "holiday_list", "company"]
     )
-    
-    company_defaults = {}
-    companies = {e.company for e in employee_data}
-    if companies:
-        comp_data = frappe.db.get_all("Company",
-            filters={"name": ("in", list(companies))},
-            fields=["name", "default_holiday_list"]
-        )
-        company_defaults = {c.name: c.default_holiday_list for c in comp_data}
-    
-    return {
+    company_defaults = {
+        c.name: c.default_holiday_list for c in frappe.get_all("Company", fields=["name", "default_holiday_list"])
+    }
+    holiday_lists = {
         e.name: e.holiday_list or company_defaults.get(e.company)
         for e in employee_data
     }
 
-def process_data(leave_applications, holiday_lists, holidays):
     data = []
-    module_path = "tajff.tajff.report.official_holiday_within_leave_period.official_holiday_within_leave_period" 
-
+    path = "tajff.tajff.report.official_holiday_within_leave_period.official_holiday_within_leave_period"
     holiday_dates = set(holidays.keys())
-    
+
     for la in leave_applications:
-        holiday_list = holiday_lists.get(la.employee)
-        if not holiday_list:
-            continue
-            
-        # Calculate overlapping holidays
-        overlapping_days = {
-            d: holidays[d] for d in holiday_dates 
-            if la.from_date <= d <= la.to_date
-        }
-        
-        if not overlapping_days:
+        hl = holiday_lists.get(la.employee)
+        if not hl:
             continue
 
+        overlapping = {d: holidays[d] for d in holiday_dates if la.from_date <= d <= la.to_date}
+        if not overlapping:
+            continue
+
+        parent_id = la.name
         button_html = f"""
         <button class='btn btn-xs btn-primary'
             onclick='
-                const msg_html = `<div style="margin-bottom: 15px;">
-                    {_("Do you want to update compensated days?")}
-                    <div class="form-group" style="margin-top: 10px;">
-                        <input type="number" 
-                            id="comp_days_input" 
-                            class="form-control" 
-                            value="{len(overlapping_days)}"
-                            min="0"
-                            max="{len(overlapping_days)}"
-                            style="width: 100px; margin: 0 auto;"
-                        >
-                        <div class="text-muted small" style="margin-top: 5px;">
-                            {_("Maximum value: ")}{len(overlapping_days)}
-                        </div>
-                    </div>
-                </div>`;
-                
                 const dialog = new frappe.ui.Dialog({{
                     title: __("Update Compensated Days"),
-                    fields: [{{
-                        fieldname: "message",
-                        fieldtype: "HTML",
-                        options: msg_html
-                    }}],
+                    fields: [
+                        {{
+                            label: __("Number of Days"),
+                            fieldname: "comp_days_input",
+                            fieldtype: "Int",
+                            default: {len(overlapping)},
+                            reqd: 1,
+                            description: __("Maximum value: {len(overlapping)}"),
+                        }}
+                    ],
                     primary_action_label: __("Update"),
                     secondary_action_label: __("Remove"),
-                    primary_action: function() {{
-                        const days = $("#comp_days_input").val();
+                    primary_action(values) {{
+                        const days = values.comp_days_input;
+                        const maxDays = {len(overlapping)};
                         if (days > maxDays) {{
                             frappe.msgprint(__("Value cannot exceed maximum allowed days"));
                             return;
                         }}
                         frappe.call({{
-                            method: "{module_path}.update_compensated_days",
+                            method: "{path}.update_compensated_days",
                             args: {{
-                                "leave_application": "{la.name}",
-                                "days_count": days
+                                leave_application: "{la.name}",
+                                days_count: days
                             }},
-                            callback: function(r) {{
+                            callback: r => {{
                                 frappe.msgprint(r.message);
                                 frappe.query_report.refresh();
                                 dialog.hide();
                             }}
                         }});
                     }},
-                    secondary_action: function() {{
+                    secondary_action() {{
                         frappe.call({{
-                            method: "{module_path}.remove_compensated_days",
-                            args: {{
-                                "leave_application": "{la.name}"
-                            }},
-                            callback: function(r) {{
+                            method: "{path}.remove_compensated_days",
+                            args: {{ leave_application: "{la.name}" }},
+                            callback: r => {{
                                 frappe.msgprint(r.message);
                                 frappe.query_report.refresh();
                                 dialog.hide();
@@ -188,29 +139,12 @@ def process_data(leave_applications, holiday_lists, holidays):
                         }});
                     }}
                 }});
-                
-                // Add custom cancel button
-                dialog.footer.find(".btn-secondary").after(
-                    `<button class="btn btn-default btn-sm">{_("Cancel")}</button>`
-                ).on("click", () => dialog.hide());
-                
-                // Show dialog and focus input
                 dialog.show();
-                setTimeout(() => {{
-                    $("#comp_days_input").focus().select();
-                    // Enforce max value on input
-                    $("#comp_days_input").on("input", function() {{
-                        if (this.value > maxDays) this.value = maxDays;
-                    }});
-                }}, 300);
-            '>
-            {_('Update')}
-        </button>
+            '>{_("Update")}</button>
         """
 
-        # Create parent row for leave application
-        parent_id = f"{la.name}"
-        parent_row = {
+
+        data.append({
             "id": parent_id,
             "leave_application": la.name,
             "employee": la.employee,
@@ -218,23 +152,19 @@ def process_data(leave_applications, holiday_lists, holidays):
             "leave_type": la.leave_type,
             "from_date": la.from_date,
             "to_date": la.to_date,
-            "holiday_list": holiday_list,
-            "holiday_count": len(overlapping_days),
+            "holiday_list": hl,
+            "holiday_count": len(overlapping),
             "holiday_date": None,
             "holiday_description": None,
             "action": button_html,
             "indent": 0,
             "has_children": 1,
-            "parent_id": None,
-        }
-        data.append(parent_row)
-        
-        # Create child rows for each holiday
-        sorted_days = sorted(overlapping_days.keys())
-        for idx, holiday_date in enumerate(sorted_days):
-            child_id = f"{parent_id}-H{idx+1}"
-            child_row = {
-                "id": child_id,
+            "parent_id": None
+        })
+
+        for i, date in enumerate(sorted(overlapping.keys())):
+            data.append({
+                "id": f"{parent_id}-H{i+1}",
                 "leave_application": "",
                 "employee": None,
                 "employee_name": None,
@@ -243,25 +173,49 @@ def process_data(leave_applications, holiday_lists, holidays):
                 "to_date": None,
                 "holiday_list": None,
                 "holiday_count": None,
-                "holiday_date": holiday_date,
-                "holiday_description": holidays[holiday_date],
-                "action": "",  # No button for child rows
+                "holiday_date": date,
+                "holiday_description": overlapping[date],
+                "action": "",
                 "indent": 1,
                 "has_children": 0,
                 "parent_id": parent_id
-            }
-            data.append(child_row)
-    
+            })
+
     return data
 
 @frappe.whitelist()
 def update_compensated_days(leave_application, days_count):
-    # Convert to int since input comes as string
-    days_count = int(days_count)
+    days_count = float(days_count)
+
+    # إذا كانت القيمة 0، فقط حدث الحقل واخرج
+    if days_count == 0:
+        frappe.db.set_value("Leave Application", leave_application, "taj_overlapping_days_compensated", 0)
+        return _("Compensated days set to 0. No leave allocation was created.")
+
+    la = frappe.get_doc("Leave Application", leave_application)
+
+    existing_alloc = frappe.db.sql("""
+        SELECT name FROM `tabLeave Allocation`
+        WHERE employee = %s AND leave_type = %s
+        AND from_date <= %s AND to_date >= %s
+        AND docstatus = 1 LIMIT 1
+    """, (la.employee, la.leave_type, la.from_date, la.to_date), as_dict=True)
+
+    if not existing_alloc:
+        frappe.throw(_("No existing Leave Allocation found for employee {0} and leave type {1}").format(
+            frappe.bold(la.employee), frappe.bold(la.leave_type)
+        ))
+
+    # تحديث قيمة الحقل في الإجازة
     frappe.db.set_value("Leave Application", leave_application, "taj_overlapping_days_compensated", days_count)
-    return _("Compensated days updated to {0}").format(days_count)
+
+    # تخصيص أيام إجازة جديدة
+    allocation = frappe.get_doc("Leave Allocation", existing_alloc[0].name)
+    allocation.allocate_leaves_manually(new_leaves=days_count, from_date=today())
+
+    return _("Compensated days updated and {0} leave days manually allocated.").format(days_count)
 
 @frappe.whitelist()
 def remove_compensated_days(leave_application):
     frappe.db.set_value("Leave Application", leave_application, "taj_overlapping_days_compensated", 0)
-    return _("Compensated days removed successfully")
+    return _("Compensated days removed successfully.")

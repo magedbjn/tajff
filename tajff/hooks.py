@@ -145,16 +145,17 @@ override_doctype_class = {
 # Hook on document methods and events
 
 doc_events = {
-    "Item":{
-        'validate': "tajff.qc.doctype.raw_material_specification.override.item.raw_material_specification"
+    "Item": {
+        "validate": "tajff.qc.doctype.raw_material_specification.override.item.raw_material_specification"
     },
     "Leave Application": {
         "before_save": "tajff.custom.leave_Application.before_save",
         "before_submit": "tajff.custom.leave_Application.validate_employee"
-	},
+    },
     "Gratuity": {
         "validate": "tajff.overrides.gratuity.get_employee_details",
     },
+
     # "Licenses":{
     #     'before_save': "tajff.documents.doctype.licenses.licenses.before_save",
     #     'on_update': "tajff.documents.doctype.licenses.licenses.on_update"
@@ -164,7 +165,7 @@ doc_events = {
 # 		"on_cancel": "method",
 # 		"on_trash": "method"
 # 	}
- }
+}
 
 # Scheduled Tasks
 # ---------------

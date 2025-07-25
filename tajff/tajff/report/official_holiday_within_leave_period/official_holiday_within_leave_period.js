@@ -1,5 +1,6 @@
-// Copyright (c) 2025, Maged BAjandooh and contributors
+// Copyright (c) 2025, Maged Bajandooh and contributors
 // For license information, please see license.txt
+
 frappe.query_reports["Official Holiday Within Leave Period"] = {
     filters: [
         {
@@ -23,5 +24,4 @@ frappe.query_reports["Official Holiday Within Leave Period"] = {
             options: "Employee",
         },
     ],
-    
 };
