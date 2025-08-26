@@ -5,9 +5,19 @@ frappe.ui.form.on('BOM', {
             const min = row.taj_min_temperature;
             const max = row.taj_max_temperature;
 
-            if (min !== undefined && max !== undefined) {
-                if (min !== 0 && max < min) {
-                    frappe.throw(__('Row {0}: Maximum Temperature must be equal to or greater than Minimum Temperature.', [row.idx]));
+            // إذا فيه max بدون min
+            if ((min === undefined || min === null || min === 0) && (max !== undefined && max !== null)) {
+                frappe.throw(
+                    __('Row {0}: You must enter Minimum Temperature before setting Maximum Temperature.', [row.idx])
+                );
+            }
+
+            // إذا min > 0 لازم max >= min
+            if (min && min > 0 && max !== undefined && max !== null) {
+                if (max < min) {
+                    frappe.throw(
+                        __('Row {0}: Maximum Temperature must be equal to or greater than Minimum Temperature.', [row.idx])
+                    );
                 }
             }
         }
